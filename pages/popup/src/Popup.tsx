@@ -53,19 +53,13 @@ const Popup = () => {
         try {
           await chrome.sidePanel.open({ windowId: tab.windowId });
         } catch (sidePanelError) {
-          // 如果 windowId 方式失败，尝试使用 tabId
-          try {
-            await chrome.sidePanel.open({ tabId: tab.id });
-          } catch (tabIdError) {
-            console.log('Side panel 打开失败，请手动打开侧边栏查看数据', tabIdError);
-            // 显示提示信息
-            chrome.notifications.create('side-panel-info', {
-              type: 'basic',
-              iconUrl: chrome.runtime.getURL('icon-34.png'),
-              title: '数据已保存',
-              message: '请右键点击插件图标，选择"打开侧边栏"查看数据',
-            });
-          }
+          console.log('Side panel 打开失败，请手动打开侧边栏查看数据', sidePanelError);
+          chrome.notifications.create('side-panel-info', {
+            type: 'basic',
+            iconUrl: chrome.runtime.getURL('icon-34.png'),
+            title: '数据已保存',
+            message: '请右键点击插件图标，选择"打开侧边栏"查看数据',
+          });
         }
       }
     } catch (error) {
@@ -79,6 +73,25 @@ const Popup = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOpenSidePanel = async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+      await chrome.sidePanel.open({ windowId: tab.windowId });
+    } catch (error) {
+      console.error('打开侧边栏失败:', error);
+      chrome.notifications.create('side-panel-error', {
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('icon-34.png'),
+        title: '打开侧边栏失败',
+        message: '请右键点击插件图标，选择"打开侧边栏"。',
+      });
+    }
+  };
+
+  const handleOpenXhsWeb = () => {
+    chrome.tabs.create({ url: 'https://xhs-n8n-web-main.vercel.app/' });
   };
 
   return (
@@ -97,6 +110,24 @@ const Popup = () => {
           onClick={handleGetAuthorData}
           disabled={!isXhsProfile || isLoading}>
           {isLoading ? '正在获取数据...' : '获取作者数据'}
+        </button>
+
+        <button
+          className={cn(
+            'mt-3 w-full rounded-lg px-4 py-3 font-medium transition-all duration-200',
+            'cursor-pointer bg-blue-500 text-white shadow-lg hover:bg-blue-600 hover:shadow-xl',
+          )}
+          onClick={handleOpenSidePanel}>
+          查看获取详情
+        </button>
+
+        <button
+          className={cn(
+            'mt-3 w-full rounded-lg px-4 py-3 font-medium transition-all duration-200',
+            'cursor-pointer bg-green-500 text-white shadow-lg hover:bg-green-600 hover:shadow-xl',
+          )}
+          onClick={handleOpenXhsWeb}>
+          一键仿写
         </button>
 
         {!isXhsProfile && (
