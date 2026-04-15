@@ -20,12 +20,13 @@ const configs = Object.entries(getContentScriptEntries(matchesDir)).map(([name, 
     plugins: [IS_DEV && makeEntryPointPlugin()],
     build: {
       lib: {
-        name: name,
+        name: name.replace(/-/g, '_'),
         formats: ['iife'],
         entry,
         fileName: name,
       },
       outDir: resolve(rootDir, '..', '..', 'dist', 'content'),
+      emptyOutDir: false,
     },
   }),
 );

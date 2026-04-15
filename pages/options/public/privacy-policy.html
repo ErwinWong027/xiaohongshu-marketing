@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>隐私政策 — 小红书自动运营助手</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+      color: #1a1a1a;
+      line-height: 1.7;
+      background: #fafafa;
+    }
+    h1 { font-size: 1.8rem; color: #FF2442; margin-bottom: 4px; }
+    .meta { color: #888; font-size: 0.85rem; margin-bottom: 36px; }
+    h2 { font-size: 1.1rem; margin-top: 2em; color: #222; }
+    p, li { font-size: 0.97rem; color: #333; }
+    ul { padding-left: 1.4em; }
+    li { margin-bottom: 6px; }
+    .highlight {
+      background: #fff4f6;
+      border-left: 4px solid #FF2442;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin: 16px 0;
+    }
+    a { color: #FF2442; }
+    footer { margin-top: 60px; font-size: 0.82rem; color: #aaa; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1>隐私政策</h1>
+  <p class="meta">适用于：小红书自动运营助手 Chrome 扩展 &nbsp;|&nbsp; 最后更新：2026-04-13</p>
+
+  <div class="highlight">
+    <strong>核心承诺：</strong>本扩展不收集、不存储、不上传任何个人数据到第三方服务器。所有操作均在您的本地浏览器内完成。
+  </div>
+
+  <h2>1. 我们收集的信息</h2>
+  <p>本扩展<strong>不收集</strong>任何个人身份信息。扩展仅在本地访问以下数据，且仅用于实现其功能：</p>
+  <ul>
+    <li><strong>小红书 Cookie</strong>（如 <code>a1</code>、<code>webId</code>、<code>web_session</code>）：仅用于检测您是否已登录小红书，不读取 Cookie 内容，不上传。</li>
+    <li><strong>当前标签页 URL</strong>：用于判断当前页面是否为小红书作者主页，以决定是否启用"获取作者数据"功能。</li>
+    <li><strong>用户主动输入的内容</strong>：搜索关键词、评论/回复文本、AI 仿写后的编辑内容。这些数据仅在本次操作中使用，不持久化存储。</li>
+  </ul>
+
+  <h2>2. 本地存储的数据</h2>
+  <p>扩展使用 <code>chrome.storage.local</code> 在您的设备上临时存储以下内容：</p>
+  <ul>
+    <li>AI 仿写生成的草稿内容（<code>xhsPendingPublish</code>），在您确认保存草稿后自动清除。</li>
+    <li>从小红书作者页面获取的公开数据（粉丝数、笔记列表等），仅供展示使用。</li>
+  </ul>
+  <p>所有本地存储数据均<strong>不会</strong>同步到任何服务器。</p>
+
+  <h2>3. AI 仿写功能</h2>
+  <p>点击"AI 仿写"时，扩展会将您账户下已存储的笔记模板文本发送至本项目配套的 AI 接口（<code>xhs-n8n-web-main.vercel.app</code>）。发送的内容为<strong>纯文本提示词</strong>，不包含任何个人身份信息或 Cookie。</p>
+  <p>AI 接口仅用于生成文本内容，不存储任何用户数据。</p>
+
+  <h2>4. 权限使用说明</h2>
+  <ul>
+    <li><strong>cookies</strong>：仅用于检测小红书登录状态，不读取其他网站 Cookie。</li>
+    <li><strong>tabs</strong>：用于获取当前活动标签页的 URL，以及在需要时打开小红书相关页面。</li>
+    <li><strong>scripting</strong>：用于向小红书页面注入内容脚本，实现自动填写草稿、评论等功能。</li>
+    <li><strong>storage</strong>：用于在本地保存临时草稿数据。</li>
+    <li><strong>notifications</strong>：用于在数据获取/草稿保存完成时显示桌面通知。</li>
+    <li><strong>sidePanel</strong>：用于打开扩展侧边栏以展示数据和编辑仿写内容。</li>
+  </ul>
+
+  <h2>5. 数据共享</h2>
+  <p>本扩展<strong>不会</strong>将任何数据出售、出租或分享给第三方。</p>
+
+  <h2>6. 数据安全</h2>
+  <p>由于所有数据均在本地处理，不存在数据传输风险。扩展仅与小红书官方域名（<code>xiaohongshu.com</code>、<code>creator.xiaohongshu.com</code>）及上述 AI 接口通信。</p>
+
+  <h2>7. 儿童隐私</h2>
+  <p>本扩展面向成年用户，不针对 13 岁以下儿童收集任何信息。</p>
+
+  <h2>8. 政策变更</h2>
+  <p>如本政策发生重大变更，我们将更新页面顶部的"最后更新"日期，并在扩展更新日志中说明。</p>
+
+  <h2>9. 联系我们</h2>
+  <p>如您对本隐私政策有任何疑问，欢迎通过 GitHub Issues 联系我们。</p>
+
+  <hr style="margin-top:40px;border:none;border-top:1px solid #eee;" />
+
+  <!-- English version for Chrome Web Store reviewers -->
+  <h1 style="margin-top:48px;">Privacy Policy (English)</h1>
+  <p class="meta">Applies to: XHS Auto-Operations Chrome Extension &nbsp;|&nbsp; Last updated: 2026-04-13</p>
+
+  <div class="highlight">
+    <strong>Core commitment:</strong> This extension does not collect, store, or transmit any personal data to external servers. All operations occur locally within your browser.
+  </div>
+
+  <h2>Information We Access</h2>
+  <p>This extension accesses the following data <strong>locally only</strong> to provide its functionality:</p>
+  <ul>
+    <li><strong>Xiaohongshu cookies</strong> (e.g. <code>a1</code>, <code>webId</code>, <code>web_session</code>): used solely to detect whether you are logged in. Cookie values are never read or uploaded.</li>
+    <li><strong>Active tab URL</strong>: used to determine if the current page is a Xiaohongshu author profile.</li>
+    <li><strong>User-entered text</strong>: search keywords, comment/reply text, and AI-generated draft edits. Used only for the current operation and never persisted externally.</li>
+  </ul>
+
+  <h2>Local Storage</h2>
+  <p>The extension uses <code>chrome.storage.local</code> to temporarily store AI-generated draft content on your device. This data is cleared after you save the draft and is never synced to any server.</p>
+
+  <h2>AI Rewrite Feature</h2>
+  <p>When using the AI rewrite feature, template text is sent to the project's AI endpoint (<code>xhs-n8n-web-main.vercel.app</code>). No personal identifiers or cookies are included. The AI endpoint does not retain user data.</p>
+
+  <h2>Permissions</h2>
+  <ul>
+    <li><strong>cookies</strong>: detect Xiaohongshu login status only.</li>
+    <li><strong>tabs</strong>: read active tab URL; open Xiaohongshu pages as needed.</li>
+    <li><strong>scripting</strong>: inject content scripts to automate draft filling and commenting.</li>
+    <li><strong>storage</strong>: store temporary draft data locally.</li>
+    <li><strong>notifications</strong>: show desktop notifications on task completion.</li>
+    <li><strong>sidePanel</strong>: open the extension side panel.</li>
+  </ul>
+
+  <h2>Data Sharing</h2>
+  <p>We do not sell, rent, or share any data with third parties.</p>
+
+  <h2>Contact</h2>
+  <p>For questions about this policy, please open a GitHub Issue in the project repository.</p>
+
+  <footer>© 2026 小红书自动运营助手 &nbsp;·&nbsp; All rights reserved</footer>
+</body>
+</html>

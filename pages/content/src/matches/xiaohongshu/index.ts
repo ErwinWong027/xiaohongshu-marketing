@@ -41,43 +41,25 @@ const waitForElement = (selector: string, timeout = 10000): Promise<Element> =>
 const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 // 清理userId，只保留数字和英文字符
-const cleanUserId = (userId: string): string => {
-  return userId.replace(/[^a-zA-Z0-9]/g, '');
-};
+const cleanUserId = (userId: string): string => userId.replace(/[^a-zA-Z0-9]/g, '');
 
-// 同步数据到云端
-const syncToCloud = async (authorData: any) => {
-  const apiUrl = process.env.CEB_N8N_API_URL;
-  if (!apiUrl) {
-    console.warn('[XHS] 未配置API_URL，跳过云端同步');
-    return { success: false, error: '未配置API地址' };
-  }
-
+// 同步数据到云端（通过 background 代理，避免 content script 的 CORS 限制）
+const syncToCloud = async (authorData: Record<string, unknown>) => {
   try {
     console.log('[XHS] 开始同步数据到云端...');
-    
-    const response = await fetch(`${apiUrl}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(authorData),
+    const result = await chrome.runtime.sendMessage({
+      action: 'XHS_SYNC_TO_CLOUD',
+      data: authorData,
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (result?.success) {
+      console.log('[XHS] 云端同步成功:', result.data);
+    } else {
+      console.warn('[XHS] 云端同步失败:', result?.error);
     }
-
-    const result = await response.json();
-    console.log('[XHS] 云端同步成功:', result);
-    
-    return { success: true, data: result };
+    return result ?? { success: false, error: '无响应' };
   } catch (error) {
     console.error('[XHS] 云端同步失败:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : '同步失败' 
-    };
+    return { success: false, error: error instanceof Error ? error.message : '同步失败' };
   }
 };
 
@@ -121,13 +103,13 @@ const getNoteUrlFromCard = (noteItem: Element): string => {
   if (firstLink) {
     const basePath = firstLink.getAttribute('href') || '';
     linkInfo += `找到explore链接: ${basePath}; `;
-    
+
     // 查找带参数的链接
     const secondLink = noteItem.querySelector('a.cover') as HTMLAnchorElement;
     if (secondLink) {
       const secondHref = secondLink.getAttribute('href') || '';
       linkInfo += `找到cover链接: ${secondHref}; `;
-      
+
       try {
         // 解析第二个链接的参数
         const url = new URL(secondHref, window.location.origin);
@@ -153,7 +135,7 @@ const getNoteUrlFromCard = (noteItem: Element): string => {
     }
   } else {
     linkInfo += '未找到explore链接; ';
-    
+
     // 方法2: 查找任何包含 explore 的链接
     const allLinks = noteItem.querySelectorAll('a[href*="explore"]');
     if (allLinks.length > 0) {
@@ -192,40 +174,41 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
   }
 
   const originalUrl = window.location.href;
-  
+
   try {
     console.log(`[XHS] 正在导航到笔记页面: ${noteUrl}`);
-    
+
     // 直接修改当前页面URL来导航到笔记页面
     window.history.pushState({}, '', noteUrl);
-    
+
     // 等待页面状态改变和内容加载
     await delay(3000); // 增加延迟到3秒，避免被识别为爬虫
-    
+
     // 触发popstate事件来让SPA响应URL变化
     window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
-    
+
     // 再等待一段时间让页面内容完全加载
     await delay(2000);
-    
+
     // 尝试等待笔记详情页面的关键元素
     let title = cardTitle;
     let desc = '无描述内容';
     let like = cardLike;
     let collect = '0';
-    
+
     try {
       // 等待详情页面元素加载
       await waitForElement('#detail-title, .note-content, .interaction-container', 5000);
-      
+
       // 获取标题
-      const titleElement = document.querySelector('#detail-title') || 
-                          document.querySelector('.note-title') ||
-                          document.querySelector('[class*="title"]');
+      const titleElement =
+        document.querySelector('#detail-title') ||
+        document.querySelector('.note-title') ||
+        document.querySelector('[class*="title"]');
       if (titleElement?.textContent?.trim()) {
         title = titleElement.textContent.trim();
       }
-      
+
       // 获取描述内容
       const descSelectors = [
         '#detail-desc.desc',
@@ -233,9 +216,9 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
         '.note-desc',
         '.content .desc',
         '[class*="desc"]:not(.note-title)',
-        '.note-content'
+        '.note-content',
       ];
-      
+
       for (const selector of descSelectors) {
         const descElement = document.querySelector(selector);
         if (descElement?.textContent?.trim()) {
@@ -244,16 +227,16 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
           break;
         }
       }
-      
+
       // 获取点赞数
       const likeSelectors = [
         '.interaction-container .like-wrapper .count',
         '.like-wrapper .count',
         '.interaction .like .count',
         '[class*="like"] .count',
-        '[class*="like"][class*="count"]'
+        '[class*="like"][class*="count"]',
       ];
-      
+
       for (const selector of likeSelectors) {
         const likeElement = document.querySelector(selector);
         if (likeElement?.textContent?.trim()) {
@@ -262,16 +245,16 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
           break;
         }
       }
-      
+
       // 获取收藏数
       const collectSelectors = [
         '.interaction-container .collect-wrapper .count',
-        '.collect-wrapper .count', 
+        '.collect-wrapper .count',
         '.interaction .collect .count',
         '[class*="collect"] .count',
-        '[class*="collect"][class*="count"]'
+        '[class*="collect"][class*="count"]',
       ];
-      
+
       for (const selector of collectSelectors) {
         const collectElement = document.querySelector(selector);
         if (collectElement?.textContent?.trim()) {
@@ -280,7 +263,6 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
           break;
         }
       }
-      
     } catch (waitError) {
       console.warn(`[XHS] 等待详情页面元素超时: ${waitError}`);
     }
@@ -295,7 +277,7 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
     };
   } catch (error) {
     console.error(`[XHS] 获取笔记详情失败: ${error}`);
-    
+
     return {
       title: cardTitle,
       desc: `无法获取详细描述 (${error instanceof Error ? error.message : '未知错误'})`,
@@ -308,7 +290,7 @@ const fetchNoteDetails = async (noteUrl: string, cardTitle: string, cardLike: st
       console.log(`[XHS] 正在导航回原始页面: ${originalUrl}`);
       window.history.pushState({}, '', originalUrl);
       window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
-      
+
       // 等待页面恢复
       await delay(2000);
     } catch (navError) {
@@ -334,7 +316,7 @@ const getTop10Notes = async (): Promise<XhsNoteData[]> => {
       // 从卡片获取基本信息
       const titleElement = noteItem.querySelector('.footer .title');
       const cardTitle = titleElement?.textContent?.trim() || '';
-      
+
       const likeElement = noteItem.querySelector('.like-wrapper .count');
       const cardLike = likeElement?.textContent?.trim() || '0';
 
@@ -350,13 +332,13 @@ const getTop10Notes = async (): Promise<XhsNoteData[]> => {
       // 等待2-3秒避免被识别为爬虫，最后一个笔记不需要等待
       if (i < maxNotes - 1) {
         const randomDelay = 2000 + Math.random() * 1000; // 2-3秒随机延迟
-        console.log(`[XHS] 等待 ${Math.round(randomDelay / 1000 * 10) / 10} 秒后处理下一篇笔记...`);
+        console.log(`[XHS] 等待 ${Math.round((randomDelay / 1000) * 10) / 10} 秒后处理下一篇笔记...`);
         await delay(randomDelay);
       }
     } catch (error) {
       console.error(`[XHS] 获取第 ${i + 1} 篇笔记失败:`, error);
       notes.push({ title: '', desc: '获取失败', like: '0', collect: '0' });
-      
+
       // 即使出错也要等待，避免快速连续请求
       if (i < maxNotes - 1) {
         const errorDelay = 1000 + Math.random() * 1000; // 1-2秒错误延迟
@@ -403,7 +385,7 @@ const getXhsAuthorData = async (profileUrl: string) => {
 
     // 同步到云端
     const syncResult = await syncToCloud(authorData);
-    
+
     // 通知保存成功，同时包含同步结果
     chrome.runtime.sendMessage({
       action: 'XHS_DATA_SAVED',
