@@ -16,7 +16,6 @@ const Popup = () => {
   const [currentUrl, setCurrentUrl] = useState('');
   const [isXhsProfile, setIsXhsProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRewriting, setIsRewriting] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -81,20 +80,19 @@ const Popup = () => {
   // ── AI 仿写 ──────────────────────────────────────────────────────────────
 
   const handleAIRewrite = async () => {
-    setIsRewriting(true);
     try {
       const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+      // 打开 web app（用户在那里完成 AI 生成，extension 读取结果）
+      chrome.tabs.create({ url: 'https://xhs-n8n-web-main.vercel.app' });
+      // 同时切换侧边栏到仿写 Tab，等待内容就绪
       try {
         await chrome.sidePanel.open({ windowId: tab.windowId });
       } catch {
         /* ignore */
       }
       chrome.runtime.sendMessage({ type: 'XHS_SWITCH_TAB', tab: 'rewrite' }).catch(() => {});
-      await sendMsg('XHS_AUTO_REWRITE');
     } catch (err) {
       console.error('AI 仿写失败:', err);
-    } finally {
-      setIsRewriting(false);
     }
   };
 
@@ -177,15 +175,9 @@ const Popup = () => {
 
         {/* AI 仿写 */}
         <button
-          className={cn(
-            'mt-2 w-full rounded-lg px-4 py-2.5 font-medium transition-all duration-200',
-            !isRewriting
-              ? 'cursor-pointer bg-purple-500 text-white shadow hover:bg-purple-600'
-              : 'cursor-not-allowed bg-purple-300 text-white',
-          )}
-          onClick={handleAIRewrite}
-          disabled={isRewriting}>
-          {isRewriting ? '正在生成...' : 'AI 仿写（生成后可编辑）'}
+          className="mt-2 w-full cursor-pointer rounded-lg bg-purple-500 px-4 py-2.5 font-medium text-white shadow transition-all duration-200 hover:bg-purple-600"
+          onClick={handleAIRewrite}>
+          AI 仿写（跳转 web 生成）
         </button>
 
         {/* 查看详情 */}

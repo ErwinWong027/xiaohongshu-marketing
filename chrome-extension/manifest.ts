@@ -36,6 +36,10 @@ const manifest = {
   },
   content_scripts: [
     {
+      matches: ['https://xhs-n8n-web-main.vercel.app/*'],
+      js: ['content/xhs-web.iife.js'],
+    },
+    {
       matches: ['https://www.xiaohongshu.com/*', 'https://creator.xiaohongshu.com/*'],
       js: ['content/all.iife.js'],
     },

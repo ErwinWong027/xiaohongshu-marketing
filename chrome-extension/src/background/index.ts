@@ -42,6 +42,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   // ── 原有：爬取数据通知 ───────────────────────────────────────────────────
 
+  // ── web app 生成内容接收（xhs-web content script 转发）──────────────────
+  if (message.action === 'XHS_REWRITE_CONTENT') {
+    const parsed = parseAIOutput(message.content as string);
+    chrome.storage.local
+      .set({ xhsPendingPublish: parsed })
+      .then(() => {
+        // 通知 SidePanel 切换到仿写 Tab
+        chrome.runtime.sendMessage({ type: 'XHS_SWITCH_TAB', tab: 'rewrite' }).catch(() => {});
+        sendResponse({ success: true });
+      })
+      .catch(err => sendResponse({ success: false, error: String(err) }));
+    return true;
+  }
+
   // ── 云端同步（代理 content script 的跨域请求）────────────────────────────
   if (message.action === 'XHS_SYNC_TO_CLOUD') {
     getApiUrl()
