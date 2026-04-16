@@ -125,7 +125,8 @@ const Popup = () => {
   const subtextCls = isLight ? 'text-gray-500' : 'text-gray-400';
 
   return (
-    <div className={cn('App', isLight ? 'bg-slate-50' : 'bg-gray-800', 'min-w-[300px] p-4')}>
+    <div
+      className={cn('App', isLight ? 'bg-slate-50' : 'bg-gray-800', 'max-h-[580px] min-w-[300px] overflow-y-auto p-4')}>
       <div className={textCls}>
         <h1 className="mb-3 text-center text-lg font-bold">小红书自动运营</h1>
 
