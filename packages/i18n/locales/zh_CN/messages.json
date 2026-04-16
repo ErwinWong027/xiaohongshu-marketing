@@ -1,45 +1,45 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Automate XiaoHongShu (RedNote) content creation: AI rewriting, one-click draft publishing, and comment automation for creators."
+    "message": "小红书内容运营自动化助手，支持 AI 仿写、一键保存草稿、自动评论回复，让创作提效10倍。"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "RedNote Auto Marketing Assistant"
+    "message": "小红书自动运营助手"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "切换主题"
   },
   "injectButton": {
-    "message": "Click to inject Content Scripts"
+    "message": "注入内容脚本"
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "你好，我是 $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "张三"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "你好，$1"
   },
   "displayErrorInfo": {
-    "message": "Error occur"
+    "message": "发生错误"
   },
   "displayErrorDescription": {
-    "message": "Sorry, something went wrong while loading the page."
+    "message": "抱歉，页面加载时出现了问题。"
   },
   "displayErrorDetailsInfo": {
-    "message": "Error details:"
+    "message": "错误详情："
   },
   "displayErrorUnknownErrorInfo": {
-    "message": "Unknown error"
+    "message": "未知错误"
   },
   "displayErrorReset": {
-    "message": "Run Again"
+    "message": "重新运行"
   }
 }
